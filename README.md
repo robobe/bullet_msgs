@@ -270,3 +270,22 @@ and `reason`. The controller may be null before ownership. State is cached at
 10 Hz and expires in the native consumer after 1000 ms. Reads do not sample wind.
 Requests use the existing heartbeat ownership and one-second age limit, plus
 bounded request-ID deduplication. Runtime physics, not the renderer, owns gusts.
+
+## Flight analysis contracts
+
+Packaged JSON schemas `analysis_ground_truth.json`, `analysis_sensors.json`,
+`analysis_config.json`, `render_health.json`, `image_metadata.json` and
+`recording_health.json` describe diagnostic-only recording data. Physics publishes
+`analysis/physics/ground_truth` at 100 Hz and `analysis/physics/sensors` at its
+sampling rate on telemetry; app/physics publish `analysis/<role>/config` at 1 Hz.
+These snapshots retain source identities, resolved settings and Git revisions
+(with `+dirty` when applicable). They do not extend sensor-only flight feedback.
+Sensor values are the outputs actually exposed by the sensor implementation,
+including its configured filtering. Unavailable raw values are not invented.
+
+Godot publishes `analysis/render/health` at 1 Hz on the existing image endpoint:
+source age, dropped/superseded/stale frames, sequence gaps and errors. This exact
+JSON topic/schema pair is allowed beside the independent SHM descriptor input.
+The recorder locally adds `<image topic>/metadata` to link original exposure
+identity to MCAP image log time and recorder sequence. Final `recording_health`
+is an MCAP metadata record whose map values are JSON encoded.
