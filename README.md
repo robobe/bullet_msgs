@@ -248,3 +248,25 @@ required `takeoff_height_m`. The external-RC runner repeats the applied value in
 every feedback alongside its episode source. This lets the app latch the takeoff
 goal before commanding that episode without relying on the timing of a separate
 configuration advertisement. Legacy v1 feedback retains the 20 m default.
+
+## Live wind
+
+`bullet_msgs.wind` defines strict validators and exact topics
+`simulation/wind_request` (existing lifecycle/control endpoint, default 5557) and
+`simulation/wind_state` (existing telemetry endpoint, default 5555). Packaged v1
+schemas are `wind_request.json` and `wind_state.json`; native constants are in
+`include/bullet_msgs/wind.hpp`.
+
+Requests contain `schema_version`, `physics_id`, `episode_id`, `controller_id`,
+`request_id`, monotonic `issued_ms` and `settings`. Settings contain boolean
+`enabled`, `behavior` (`constant` or `gusts`), world XYZ `velocity_world_m_s`,
+nonnegative XYZ `gust_stddev_m_s`, positive `correlation_time_s` and integer `seed`.
+All numbers must be finite and within shared contract bounds. Seed is bounded to
+±(2^53−1) for exact Godot/JSON round trips.
+
+States repeat identity/settings and include current world `velocity_world_m_s`,
+`simulation_time_s`, nullable `request_id`, `result` (`idle`, `applied`, `rejected`)
+and `reason`. The controller may be null before ownership. State is cached at
+10 Hz and expires in the native consumer after 1000 ms. Reads do not sample wind.
+Requests use the existing heartbeat ownership and one-second age limit, plus
+bounded request-ID deduplication. Runtime physics, not the renderer, owns gusts.
