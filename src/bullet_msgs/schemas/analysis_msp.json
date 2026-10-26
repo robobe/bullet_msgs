@@ -37,6 +37,34 @@
     "error": {"type": ["string", "null"]},
     "rc_frames_sent": {"type": "integer", "minimum": 0},
     "last_rc_sent_at_s": {"type": ["number", "null"], "minimum": 0},
+    "msp_delivery": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "requests_hz": {"type": "number", "minimum": 0},
+        "responses_hz": {"type": "number", "minimum": 0},
+        "queue_delay_mean_s": {"type": ["number", "null"], "minimum": 0},
+        "queue_delay_max_s": {"type": ["number", "null"], "minimum": 0},
+        "response_turnaround_mean_s": {"type": ["number", "null"], "minimum": 0},
+        "response_turnaround_max_s": {"type": ["number", "null"], "minimum": 0}
+      },
+      "required": ["requests_hz", "responses_hz", "queue_delay_mean_s", "queue_delay_max_s", "response_turnaround_mean_s", "response_turnaround_max_s"]
+    },
+    "sensor_feedback": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "window_s": {"type": "number", "exclusiveMinimum": 0},
+        "expected_hz": {"type": "number", "minimum": 0},
+        "observed_hz": {"type": "number", "minimum": 0},
+        "feedback_age_s": {"type": ["number", "null"]},
+        "attitude_age_s": {"type": ["number", "null"]},
+        "barometer_age_s": {"type": ["number", "null"]},
+        "image_age_s": {"type": ["number", "null"]},
+        "image_attitude_offset_s": {"type": ["number", "null"]},
+        "vision_reason": {"type": ["string", "null"]},
+        "mission_phase": {"type": "string"}
+      },
+      "required": ["window_s", "expected_hz", "observed_hz", "feedback_age_s", "attitude_age_s", "barometer_age_s", "image_age_s", "image_attitude_offset_s", "vision_reason", "mission_phase"]
+    },
     "attitude": {
       "anyOf": [
         {"type": "null"},
@@ -78,7 +106,7 @@
       ]
     }
   },
-  "required": ["schema_version", "source", "backend", "timestamp_kind", "firmware", "error", "rc_frames_sent", "last_rc_sent_at_s", "attitude", "altitude", "status"],
+  "required": ["schema_version", "source", "backend", "timestamp_kind", "firmware", "error", "msp_delivery", "sensor_feedback", "rc_frames_sent", "last_rc_sent_at_s", "attitude", "altitude", "status"],
   "$defs": {
     "bytes": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 255}}
   }
