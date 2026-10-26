@@ -74,8 +74,11 @@ def validate_rc(value):
 
 
 def validate_config(value):
-    _shape(value, CONFIG_FIELDS)
-    _version(value['schema_version'])
+    version = value.get('schema_version') if isinstance(value, dict) else None
+    _shape(value, CONFIG_FIELDS | {'backend'} if version == 2 else CONFIG_FIELDS)
+    _integer(version, 1, 2)
+    if version == 2 and value['backend'] not in ('internal', 'betaflight'):
+        raise ValueError('unsupported backend')
     _id(value['physics_id'])
     _id(value['stream_id'])
     for key in ('mass_kg', 'gravity_m_s2', 'max_thrust_n', 'rc_angle_scale_rad', 'rc_yaw_rate_scale_rad_s',
@@ -92,7 +95,7 @@ def validate_config(value):
         _integer(channel, 1, CHANNEL_COUNT)
     if len(set((*mapping, value['arm_channel'], value['mode_channel']))) != 6:
         raise ValueError('overlapping RC mapping')
-    if value['attitude_model'] not in ('ideal', 'imu_complementary'):
+    if value['attitude_model'] not in ('ideal', 'imu_complementary', 'betaflight_imu'):
         raise ValueError('unsupported attitude model')
     camera = value['camera']
     _shape(camera, {'width_px', 'height_px', 'fov_x_deg'})

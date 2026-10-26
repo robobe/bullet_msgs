@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "physics_id": {"type": "string", "minLength": 1},
+        "episode_id": {"type": "string", "minLength": 1},
+        "stream_id": {"type": "string", "minLength": 1},
+        "step_index": {"type": "integer", "minimum": 0},
+        "simulation_time_s": {"type": "number", "minimum": 0},
+        "measurement_us": {"type": "integer", "minimum": 0}
+      },
+      "required": ["physics_id", "episode_id", "stream_id", "step_index", "simulation_time_s", "measurement_us"]
+    },
+    "backend": {"const": "betaflight"},
+    "timestamp_kind": {"const": "host_receipt"},
+    "firmware": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "api": {"$ref": "#/$defs/bytes"},
+            "variant": {"$ref": "#/$defs/bytes"},
+            "version": {"$ref": "#/$defs/bytes"}
+          },
+          "required": ["api", "variant", "version"]
+        }
+      ]
+    },
+    "error": {"type": ["string", "null"]},
+    "rc_frames_sent": {"type": "integer", "minimum": 0},
+    "last_rc_sent_at_s": {"type": ["number", "null"], "minimum": 0},
+    "attitude": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "roll_rad": {"type": "number"}, "pitch_rad": {"type": "number"},
+            "yaw_rad": {"type": "number"}, "received_at": {"type": "number", "minimum": 0}
+          },
+          "required": ["roll_rad", "pitch_rad", "yaw_rad", "received_at"]
+        }
+      ]
+    },
+    "altitude": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "altitude_m": {"type": "number"}, "vertical_speed_m_s": {"type": "number"},
+            "received_at": {"type": "number", "minimum": 0}
+          },
+          "required": ["altitude_m", "vertical_speed_m_s", "received_at"]
+        }
+      ]
+    },
+    "status": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "mode_flags": {"type": "integer", "minimum": 0},
+            "arming_disabled_flags": {"type": "integer", "minimum": 0},
+            "received_at": {"type": "number", "minimum": 0}
+          },
+          "required": ["mode_flags", "arming_disabled_flags", "received_at"]
+        }
+      ]
+    }
+  },
+  "required": ["schema_version", "source", "backend", "timestamp_kind", "firmware", "error", "rc_frames_sent", "last_rc_sent_at_s", "attitude", "altitude", "status"],
+  "$defs": {
+    "bytes": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 255}}
+  }
+}

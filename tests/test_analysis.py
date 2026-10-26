@@ -12,6 +12,12 @@ STATE = dict(episode_id='e', step_index=0, simulation_time_s=0., drone_id='drone
  ('analysis_ground_truth',dict(schema_version=1,source=SOURCE,ground_truth=STATE,publisher_drops=0)),
  ('analysis_sensors',dict(schema_version=1,source=SOURCE,sensors=dict(imu=None,barometer=None,rangefinder=None),attitude_estimate=None,publisher_drops=0)),
  ('analysis_config',dict(schema_version=1,source=SOURCE,role='physics',settings={},revisions={'repo':None})),
+ ('analysis_msp',dict(schema_version=1,source=SOURCE,backend='betaflight',timestamp_kind='host_receipt',
+                      firmware={'api':[0,1,48],'variant':[66,84,70,76],'version':[26,6,2]},error=None,
+                      rc_frames_sent=2,last_rc_sent_at_s=1.,
+                      attitude={'roll_rad':0.,'pitch_rad':0.,'yaw_rad':0.,'received_at':1.},
+                      altitude={'altitude_m':1.,'vertical_speed_m_s':0.,'received_at':1.},
+                      status={'mode_flags':1,'arming_disabled_flags':0,'received_at':1.})),
  ('image_metadata',dict(schema_version=1,image_topic='camera/front/image',image_log_time_ns=10,image_record_sequence=0,metadata=dict(session='s',sequence=1,capture_ns=1000,source=SOURCE))),
  ('recording_health',dict(schema_version=1,complete=True,reason='closed',outcome='stop',skipped_images=0,peak_queue_bytes=0,counts={},launch_id=None)),
 ])
@@ -37,7 +43,7 @@ def test_revision_snapshots_report_dirty_and_unavailable(monkeypatch,tmp_path):
         return ' M settings\n' if name=='bullet_app' else ''
     monkeypatch.setattr(provenance.subprocess,'check_output',git)
     result=provenance.revisions(tmp_path)
-    assert len(result)==6
+    assert len(result)==7
     assert result['bullet_app']=='a'*40+'+dirty'
     assert result['bullet_render'] is None
     assert result['bullet_drone']=='a'*40

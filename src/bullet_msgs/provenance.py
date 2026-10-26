@@ -5,7 +5,7 @@ import subprocess
 
 def revisions(workspace):
     result = {}
-    for name in ('bullet_drone', 'bullet_msgs', 'bullet_render', 'bullet_app', 'los_tracking', 'mcap_bagger'):
+    for name in ('bullet_drone', 'bullet_msgs', 'bullet_render', 'bullet_app', 'los_tracking', 'msp_link', 'mcap_bagger'):
         try:
             root = Path(workspace) / name
             commit = subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'], stderr=subprocess.DEVNULL, timeout=2, text=True).strip()
