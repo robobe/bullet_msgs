@@ -6,7 +6,7 @@ from .flight import _id, _integer, _number, _shape, _version, validate_source
 
 LOS_TOPIC = b'tracking/front/los'
 LOS_HZ = 30
-NAVIGATOR_STATES = ('disabled', 'acquire', 'track', 'recover', 'fault')
+NAVIGATOR_STATES = ('disabled', 'acquire', 'track', 'commit', 'recover', 'fault')
 TRACK_STAGES = ('bearing', 'ttc', 'terminal')
 ESTIMATE_FIELDS = ('elevation_deg', 'azimuth_deg', 'elevation_rate_deg_s', 'azimuth_rate_deg_s', 'optical_ttc_s')
 

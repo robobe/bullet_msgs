@@ -29,6 +29,12 @@ def test_schema_and_wire(active):
     validate(value, json.loads(schema_bytes('los_telemetry.json')))
 
 
+def test_schema_accepts_commit_state():
+    value = dict(packet(), navigator_state='commit')
+    validate_los(value)
+    validate(value, json.loads(schema_bytes('los_telemetry.json')))
+
+
 @pytest.mark.parametrize('changes', [dict(elevation_deg=float('nan')), dict(azimuth_rate_deg_s=float('inf')),
     dict(generated_us=True), dict(app_id='bad/id'), dict(navigation_sequence=0), dict(ttc_relative_residual=-1),
     dict(optical_ttc_s=0), dict(bearing_valid=False), dict(ttc_reason='not_closing'),

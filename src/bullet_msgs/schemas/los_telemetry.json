@@ -82,6 +82,7 @@
             "disabled",
             "acquire",
             "track",
+            "commit",
             "recover",
             "fault"
           ]
