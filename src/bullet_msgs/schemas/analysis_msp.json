@@ -45,7 +45,9 @@
         "queue_delay_mean_s": {"type": ["number", "null"], "minimum": 0},
         "queue_delay_max_s": {"type": ["number", "null"], "minimum": 0},
         "response_turnaround_mean_s": {"type": ["number", "null"], "minimum": 0},
-        "response_turnaround_max_s": {"type": ["number", "null"], "minimum": 0}
+        "response_turnaround_max_s": {"type": ["number", "null"], "minimum": 0},
+        "attitude": {"$ref": "#/$defs/delivery_metrics"},
+        "altitude": {"$ref": "#/$defs/delivery_metrics"}
       },
       "required": ["requests_hz", "responses_hz", "queue_delay_mean_s", "queue_delay_max_s", "response_turnaround_mean_s", "response_turnaround_max_s"]
     },
@@ -61,7 +63,17 @@
         "image_age_s": {"type": ["number", "null"]},
         "image_attitude_offset_s": {"type": ["number", "null"]},
         "vision_reason": {"type": ["string", "null"]},
-        "mission_phase": {"type": "string"}
+        "mission_phase": {"type": "string"},
+        "input_feedback_queue_depth": {"type": "integer", "minimum": 0},
+        "input_dropped_feedback": {"type": "integer", "minimum": 0},
+        "input_malformed_messages": {"type": "integer", "minimum": 0},
+        "input_age_s": {"type": ["number", "null"], "minimum": 0},
+        "output_bbox_queue_depth": {"type": "integer", "minimum": 0},
+        "output_los_queue_depth": {"type": "integer", "minimum": 0},
+        "output_msp_delivery_queue_depth": {"type": "integer", "minimum": 0},
+        "output_dropped_bbox": {"type": "integer", "minimum": 0},
+        "output_dropped_los": {"type": "integer", "minimum": 0},
+        "output_dropped_msp_delivery": {"type": "integer", "minimum": 0}
       },
       "required": ["window_s", "expected_hz", "observed_hz", "feedback_age_s", "attitude_age_s", "barometer_age_s", "image_age_s", "image_attitude_offset_s", "vision_reason", "mission_phase"]
     },
@@ -108,6 +120,18 @@
   },
   "required": ["schema_version", "source", "backend", "timestamp_kind", "firmware", "error", "msp_delivery", "sensor_feedback", "rc_frames_sent", "last_rc_sent_at_s", "attitude", "altitude", "status"],
   "$defs": {
-    "bytes": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 255}}
+    "bytes": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 255}},
+    "delivery_metrics": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "requests_hz": {"type": "number", "minimum": 0},
+        "responses_hz": {"type": "number", "minimum": 0},
+        "queue_delay_mean_s": {"type": ["number", "null"], "minimum": 0},
+        "queue_delay_max_s": {"type": ["number", "null"], "minimum": 0},
+        "response_turnaround_mean_s": {"type": ["number", "null"], "minimum": 0},
+        "response_turnaround_max_s": {"type": ["number", "null"], "minimum": 0}
+      },
+      "required": ["requests_hz", "responses_hz", "queue_delay_mean_s", "queue_delay_max_s", "response_turnaround_mean_s", "response_turnaround_max_s"]
+    }
   }
 }

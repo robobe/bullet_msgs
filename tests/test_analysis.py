@@ -6,22 +6,26 @@ from bullet_msgs import schema_bytes
 
 SOURCE = dict(physics_id='p', episode_id='e', stream_id='s', step_index=0, simulation_time_s=0., measurement_us=1)
 STATE = dict(episode_id='e', step_index=0, simulation_time_s=0., drone_id='drone_1', position_m=[0.,0.,1.], orientation_xyzw=[0.,0.,0.,1.], linear_velocity_m_s=[0.,0.,0.], angular_velocity_rad_s=[0.,0.,0.], rotor_speeds_rad_s=[0.]*4)
+DELIVERY = dict(requests_hz=10,responses_hz=10,queue_delay_mean_s=0.,queue_delay_max_s=0.,response_turnaround_mean_s=.001,response_turnaround_max_s=.001)
+CURRENT_MSP = dict(schema_version=1,source=SOURCE,backend='betaflight',timestamp_kind='host_receipt',
+                   firmware={'api':[0,1,48],'variant':[66,84,70,76],'version':[26,6,2]},error=None,
+                   rc_frames_sent=2,last_rc_sent_at_s=1.,
+                   msp_delivery=dict(DELIVERY,attitude=dict(DELIVERY),altitude=dict(DELIVERY)),
+                   sensor_feedback=dict(window_s=1.,expected_hz=120.,observed_hz=120.,feedback_age_s=.001,
+                                        attitude_age_s=.001,barometer_age_s=.001,image_age_s=.01,
+                                        image_attitude_offset_s=.002,vision_reason='usable',mission_phase='LOS_ACQUIRE',
+                                        input_feedback_queue_depth=1,input_dropped_feedback=0,input_malformed_messages=0,
+                                        input_age_s=.001,output_bbox_queue_depth=0,output_los_queue_depth=0,
+                                        output_msp_delivery_queue_depth=0,output_dropped_bbox=0,output_dropped_los=0,
+                                        output_dropped_msp_delivery=0),
+                   attitude=None,altitude=None,status={'mode_flags':1,'arming_disabled_flags':0,'received_at':1.})
 
 
 @pytest.mark.parametrize('name,value', [
  ('analysis_ground_truth',dict(schema_version=1,source=SOURCE,ground_truth=STATE,publisher_drops=0)),
  ('analysis_sensors',dict(schema_version=1,source=SOURCE,sensors=dict(imu=None,barometer=None,rangefinder=None),attitude_estimate=None,publisher_drops=0)),
  ('analysis_config',dict(schema_version=1,source=SOURCE,role='physics',settings={},revisions={'repo':None})),
- ('analysis_msp',dict(schema_version=1,source=SOURCE,backend='betaflight',timestamp_kind='host_receipt',
-                      firmware={'api':[0,1,48],'variant':[66,84,70,76],'version':[26,6,2]},error=None,
-                      rc_frames_sent=2,last_rc_sent_at_s=1.,
-                      msp_delivery=dict(requests_hz=10,responses_hz=10,queue_delay_mean_s=0.,queue_delay_max_s=0.,
-                                        response_turnaround_mean_s=.001,response_turnaround_max_s=.001),
-                      sensor_feedback=dict(window_s=1.,expected_hz=120.,observed_hz=120.,feedback_age_s=.001,
-                                           attitude_age_s=.001,barometer_age_s=.001,image_age_s=.01,
-                                           image_attitude_offset_s=.002,vision_reason='usable',mission_phase='LOS_ACQUIRE'),
-                      attitude=None, altitude=None,
-                      status={'mode_flags':1,'arming_disabled_flags':0,'received_at':1.})),
+ ('analysis_msp',CURRENT_MSP),
  ('image_metadata',dict(schema_version=1,image_topic='camera/front/image',image_log_time_ns=10,image_record_sequence=0,metadata=dict(session='s',sequence=1,capture_ns=1000,source=SOURCE))),
  ('recording_health',dict(schema_version=1,complete=True,reason='closed',outcome='stop',skipped_images=0,peak_queue_bytes=0,counts={},launch_id=None)),
 ])
@@ -33,6 +37,11 @@ def test_analysis_schema_validates_and_rejects_unknown_fields(name,value):
         validator.validate(dict(value,unexpected=True))
     with pytest.raises(ValidationError):
         validator.validate({k:v for k,v in value.items() if k!='schema_version'})
+    if name == 'analysis_msp':
+        with pytest.raises(ValidationError):
+            validator.validate(dict(value,sensor_feedback=dict(value['sensor_feedback'],unexpected=True)))
+        with pytest.raises(ValidationError):
+            validator.validate(dict(value,msp_delivery=dict(value['msp_delivery'],attitude=dict(value['msp_delivery']['attitude'],unexpected=True))))
 
 
 def test_revision_snapshots_report_dirty_and_unavailable(monkeypatch,tmp_path):
