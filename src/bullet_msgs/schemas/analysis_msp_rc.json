@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "physics_id": {"type": "string", "minLength": 1},
+        "episode_id": {"type": "string", "minLength": 1},
+        "stream_id": {"type": "string", "minLength": 1},
+        "step_index": {"type": "integer", "minimum": 0},
+        "simulation_time_s": {"type": "number", "minimum": 0},
+        "measurement_us": {"type": "integer", "minimum": 0}
+      },
+      "required": ["physics_id", "episode_id", "stream_id", "step_index", "simulation_time_s", "measurement_us"]
+    },
+    "backend": {"const": "betaflight"},
+    "timestamp_kind": {"const": "host_monotonic"},
+    "sent_at_us": {"type": "integer", "minimum": 0},
+    "connection_generation": {"type": "integer", "minimum": 0},
+    "channels": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": {"type": "integer", "minimum": 1000, "maximum": 2000}
+    }
+  },
+  "required": ["schema_version", "source", "backend", "timestamp_kind", "sent_at_us", "connection_generation", "channels"]
+}

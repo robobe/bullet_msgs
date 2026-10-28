@@ -32,6 +32,14 @@ def test_wire_schema_and_nonfinite_bounds():
         decode(b'[' * 1200 + b']' * 1200, validate_rc)
 
 
+def test_msp_rc_delivery_schema_requires_eighteen_pwm_channels():
+    packet = dict(schema_version=1, source=SOURCE, backend='betaflight', timestamp_kind='host_monotonic',
+                  sent_at_us=1234567, connection_generation=1, channels=[1500] * 18)
+    schema = Draft202012Validator(json.loads(schema_bytes('analysis_msp_rc.json')))
+    schema.validate(packet)
+    assert not schema.is_valid(dict(packet, channels=[1500] * 17))
+
+
 def test_stamped_descriptor_preserves_source_and_binary_header():
     writer = FrameWriter(2, 2)
     reader = FrameReader('camera/front/image')
